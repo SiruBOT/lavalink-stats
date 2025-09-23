@@ -1,0 +1,17 @@
+{
+  "name": "lavalink-stats",
+  "version": "1.0.0",
+  "description": "A Node.js application to collect Lavalink server statistics and store them in a database",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "keywords": ["lavalink", "stats", "monitoring", "database"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "sqlite3": "^5.1.6"
+  }
+}
