@@ -96,8 +96,8 @@ class LavalinkDashboard {
                 },
                 elements: {
                     point: {
-                        radius: 3,
-                        hoverRadius: 6
+                        radius: 0,
+                        // hoverRadius: 6
                     }
                 }
             }
@@ -159,8 +159,8 @@ class LavalinkDashboard {
                 },
                 elements: {
                     point: {
-                        radius: 3,
-                        hoverRadius: 6
+                        radius: 0,
+                        // hoverRadius: 
                     }
                 }
             }
