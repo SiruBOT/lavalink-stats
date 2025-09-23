@@ -37,12 +37,13 @@ class StatsCollector {
   async fetchAllStats() {
     const results = [];
 
-    for (const [host, password] of config.hosts) {
+    for (const [host, password, name] of config.hosts) {
       try {
         console.log(`Fetching stats from ${host}...`);
         const stats = await this.fetchStats(host, password);
         results.push({
           host,
+          name,
           stats,
           error: null
         });
@@ -50,6 +51,7 @@ class StatsCollector {
       } catch (error) {
         results.push({
           host,
+          name,
           stats: null,
           error: error.message
         });

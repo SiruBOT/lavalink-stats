@@ -44,7 +44,7 @@ class LavalinkStatsApp {
         }
 
         try {
-          await this.database.insertStats(result.host, result.stats);
+          await this.database.insertStats(result.host, result.name, result.stats);
           successCount++;
         } catch (dbError) {
           console.error(`Failed to store stats for ${result.host}:`, dbError.message);

@@ -2,8 +2,11 @@ class LavalinkDashboard {
     constructor() {
         this.charts = {};
         this.refreshInterval = null;
+        this.countdownInterval = null;
         this.autoRefreshEnabled = true;
         this.currentTimeRange = 24;
+        this.refreshPeriodMs = 30000;
+        this.remainingSeconds = Math.floor(this.refreshPeriodMs / 1000);
         
         this.init();
     }
@@ -11,6 +14,7 @@ class LavalinkDashboard {
     async init() {
         this.setupEventListeners();
         this.initializeCharts();
+        this.setupResizeObservers();
         await this.loadData();
         this.startAutoRefresh();
     }
@@ -25,11 +29,6 @@ class LavalinkDashboard {
             } else {
                 this.stopAutoRefresh();
             }
-        });
-
-        // 수동 새로고침 버튼
-        document.getElementById('manualRefresh').addEventListener('click', () => {
-            this.loadData();
         });
 
         // 시간 범위 선택
@@ -76,7 +75,7 @@ class LavalinkDashboard {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         position: 'top',
@@ -133,7 +132,7 @@ class LavalinkDashboard {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         position: 'top',
@@ -166,6 +165,42 @@ class LavalinkDashboard {
                 }
             }
         });
+    }
+
+    setupResizeObservers() {
+        const debounce = (fn, delay = 100) => {
+            let t = null;
+            return (...args) => {
+                if (t) clearTimeout(t);
+                t = setTimeout(() => fn.apply(this, args), delay);
+            };
+        };
+
+        const resizeAll = () => {
+            if (this.charts.players && typeof this.charts.players.resize === 'function') {
+                this.charts.players.resize();
+            }
+            if (this.charts.cpu && typeof this.charts.cpu.resize === 'function') {
+                this.charts.cpu.resize();
+            }
+        };
+
+        const debouncedResizeAll = debounce(resizeAll, 100);
+
+        // Window resize fallback
+        window.addEventListener('resize', debouncedResizeAll);
+
+        // Observe chart containers for layout changes
+        const playersCanvas = document.getElementById('playersChart');
+        const cpuCanvas = document.getElementById('cpuChart');
+        const targets = [playersCanvas?.parentElement, cpuCanvas?.parentElement].filter(Boolean);
+        if (targets.length > 0 && 'ResizeObserver' in window) {
+            const ro = new ResizeObserver(() => {
+                debouncedResizeAll();
+            });
+            targets.forEach(el => ro.observe(el));
+            this._resizeObserver = ro;
+        }
     }
 
     dispose() {
@@ -270,11 +305,12 @@ class LavalinkDashboard {
         
         card.innerHTML = `
             <div class="server-header">
-                <div class="server-name">${server.host}</div>
+                <div class="server-name">${server.name || server.host}</div>
                 <div class="server-status ${isOnline ? 'online' : 'offline'}">
                     ${isOnline ? 'ONLINE' : 'OFFLINE'}
                 </div>
             </div>
+            ${server.name ? `<div style="margin-top: -6px; color: #6b7280; font-size: 12px;">${server.host}</div>` : ''}
             
             ${isOnline ? `
                 <div class="server-metrics">
@@ -418,12 +454,47 @@ class LavalinkDashboard {
         document.getElementById('lastUpdated').textContent = now.toLocaleString('ko-KR');
     }
 
+    startCountdown() {
+        this.remainingSeconds = Math.floor(this.refreshPeriodMs / 1000);
+        this.updateCountdownLabel();
+        if (this.countdownInterval) clearInterval(this.countdownInterval);
+        this.countdownInterval = setInterval(() => {
+            if (!this.autoRefreshEnabled) {
+                this.updateCountdownLabel('--');
+                return;
+            }
+            this.remainingSeconds -= 1;
+            if (this.remainingSeconds <= 0) {
+                this.remainingSeconds = 0;
+            }
+            this.updateCountdownLabel();
+        }, 1000);
+    }
+
+    resetCountdown() {
+        if (!this.autoRefreshEnabled) return;
+        this.remainingSeconds = Math.floor(this.refreshPeriodMs / 1000);
+        this.updateCountdownLabel();
+    }
+
+    updateCountdownLabel(forceText) {
+        const el = document.getElementById('refreshCountdown');
+        if (!el) return;
+        if (typeof forceText === 'string') {
+            el.textContent = forceText;
+        } else {
+            el.textContent = `${this.remainingSeconds}`;
+        }
+    }
+
     startAutoRefresh() {
         this.stopAutoRefresh();
         if (this.autoRefreshEnabled) {
             this.refreshInterval = setInterval(() => {
                 this.loadData();
-            }, 30000); // 30초마다 새로고침
+                this.resetCountdown();
+            }, this.refreshPeriodMs);
+            this.startCountdown();
         }
     }
 
@@ -431,6 +502,10 @@ class LavalinkDashboard {
         if (this.refreshInterval) {
             clearInterval(this.refreshInterval);
             this.refreshInterval = null;
+        }
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
         }
     }
 

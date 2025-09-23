@@ -22,7 +22,7 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background-color: var(--background);
     color: var(--text-primary);
     line-height: 1.6;
@@ -40,7 +40,6 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
-    padding: 20px 0;
     border-bottom: 2px solid var(--border-color);
 }
 
@@ -57,12 +56,16 @@ body {
 .refresh-controls {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 0.5rem;
 }
 
 .refresh-label {
     font-weight: 500;
     color: var(--text-secondary);
+}
+
+#refreshCountdownLabel strong {
+    color: var(--primary-color);
 }
 
 /* 스위치 스타일 */
@@ -207,14 +210,18 @@ input:checked + .slider:before {
     padding: 25px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border-color);
-    height: 400px;
 }
 
 .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+}
+
+.chart-canvas {
+    height: 20rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .chart-header h3 {
@@ -235,13 +242,33 @@ input:checked + .slider:before {
     background: white;
     color: var(--text-primary);
     font-size: 14px;
-    cursor: pointer;
+    padding-right: 36px;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .time-select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* 비활성 상태 및 호버 상태 */
+.time-select:hover {
+    border-color: #d1d5db;
+}
+
+.time-select:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* iOS 사파리 보정: 내부 그림자 제거 */
+select.time-select::-webkit-inner-spin-button,
+select.time-select::-webkit-outer-spin-button,
+select.time-select::-ms-expand {
+    appearance: none;
+    display: none;
 }
 
 /* 서버 섹션 */
@@ -444,9 +471,10 @@ input:checked + .slider:before {
     }
     
     .header {
-        flex-direction: column;
-        gap: 20px;
+        flex-direction: row;
         text-align: center;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .header h1 {

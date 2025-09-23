@@ -26,6 +26,7 @@ class Database {
         CREATE TABLE IF NOT EXISTS lavalink_stats (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           host TEXT NOT NULL,
+          name TEXT,
           timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
           players INTEGER,
           playing_players INTEGER,
@@ -45,25 +46,53 @@ class Database {
           console.error('Error creating table:', err.message);
           reject(err);
         } else {
-          console.log('Database tables created successfully');
-          resolve();
+          // 기존 DB에 name 컬럼이 없는 경우 추가
+          this.ensureColumnExists('lavalink_stats', 'name', 'TEXT')
+            .then(() => {
+              console.log('Database tables created/updated successfully');
+              resolve();
+            })
+            .catch(reject);
         }
       });
     });
   }
 
-  async insertStats(host, stats) {
+  async ensureColumnExists(tableName, columnName, columnType) {
+    return new Promise((resolve, reject) => {
+      const pragmaSql = `PRAGMA table_info(${tableName})`;
+      this.db.all(pragmaSql, (err, rows) => {
+        if (err) {
+          return reject(err);
+        }
+        const exists = rows.some(row => row.name === columnName);
+        if (exists) {
+          return resolve();
+        }
+        const alterSql = `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${columnType}`;
+        this.db.run(alterSql, (alterErr) => {
+          if (alterErr) {
+            return reject(alterErr);
+          }
+          resolve();
+        });
+      });
+    });
+  }
+
+  async insertStats(host, name, stats) {
     return new Promise((resolve, reject) => {
       const insertSQL = `
         INSERT INTO lavalink_stats (
-          host, players, playing_players, uptime,
+          host, name, players, playing_players, uptime,
           memory_free, memory_used, memory_allocated, memory_reservable,
           cpu_cores, cpu_system_load, cpu_lavalink_load
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `;
 
       const values = [
         host,
+        name,
         stats.players,
         stats.playingPlayers,
         stats.uptime,
