@@ -115,4 +115,4 @@ The application expects Lavalink stats to be returned in the following format:
 
 ## License
 
-MIT
+WTFPL
