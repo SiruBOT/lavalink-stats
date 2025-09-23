@@ -1,4 +1,5 @@
 const LavalinkStatsApp = require('./app');
+const { start: startWebServer } = require('./server');
 
 async function main() {
   try {
@@ -7,8 +8,10 @@ async function main() {
     
     await app.initialize();
     app.start();
+    // 웹 서버 시작 (Fastify)
+    await startWebServer();
     
-    console.log('Lavalink Stats Application is running...');
+    console.log('Lavalink Stats Application is running with Web Dashboard...');
     console.log('Press Ctrl+C to stop');
     
   } catch (error) {

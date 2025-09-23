@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  lavalink-stats:
+    build: .
+    container_name: lavalink-stats
+    ports:
+      - "3000:3000"
+    environment:
+      # 예: "10.0.0.201:2333:youshallnotpass;10.0.0.202:2333:youshallnotpass"
+      - LL_HOSTS=
+      - COLLECTION_INTERVAL_MS=60000
+      - REQUEST_TIMEOUT_MS=10000
+      - DB_PATH=/app/data/lavalink_stats.db
+      - PORT=3000
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

@@ -88,6 +88,65 @@ class Database {
     });
   }
 
+  async getLatestStats() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT * FROM (
+          SELECT *, ROW_NUMBER() OVER (PARTITION BY host ORDER BY timestamp DESC) as rn
+          FROM lavalink_stats
+        ) WHERE rn = 1
+        ORDER BY host
+      `;
+      
+      this.db.all(sql, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  }
+
+  async getStatsHistory(host = null, hours = 24) {
+    return new Promise((resolve, reject) => {
+      let sql = `
+        SELECT * FROM lavalink_stats 
+        WHERE timestamp > datetime('now', '-${hours} hours')
+      `;
+      let params = [];
+      
+      if (host) {
+        sql += ' AND host = ?';
+        params.push(host);
+      }
+      
+      sql += ' ORDER BY timestamp ASC';
+      
+      this.db.all(sql, params, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
+    });
+  }
+
+  async getHosts() {
+    return new Promise((resolve, reject) => {
+      const sql = 'SELECT DISTINCT host FROM lavalink_stats ORDER BY host';
+      
+      this.db.all(sql, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows.map(row => row.host));
+        }
+      });
+    });
+  }
+
   async close() {
     return new Promise((resolve) => {
       if (this.db) {
