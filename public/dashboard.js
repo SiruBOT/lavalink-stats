@@ -79,6 +79,13 @@ class LavalinkDashboard {
                 plugins: {
                     legend: {
                         position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y}`;
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -97,7 +104,7 @@ class LavalinkDashboard {
                 elements: {
                     point: {
                         radius: 0,
-                        // hoverRadius: 6
+                        hoverRadius: 6
                     }
                 }
             }
@@ -136,6 +143,13 @@ class LavalinkDashboard {
                 plugins: {
                     legend: {
                         position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y}%`;
+                            }
+                        }
                     }
                 },
                 scales: {
@@ -160,7 +174,7 @@ class LavalinkDashboard {
                 elements: {
                     point: {
                         radius: 0,
-                        // hoverRadius: 
+                        hoverRadius: 6
                     }
                 }
             }
