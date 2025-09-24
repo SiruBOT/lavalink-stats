@@ -11,6 +11,15 @@ A Node.js application that collects Lavalink server statistics and stores them i
 - Error handling and logging
 - Graceful shutdown handling
 
+## Screenshot
+![Image](/public/image.png)
+
+## Prerequisites
+- Node.js 20.x
+- Yarn 4.x
+- This application is only compatible with Lavalink 3.x (SiruBOT production using legacy Lavalink 3.x), in future support for Lavalink 4.x will be added
+
+
 ## Installation
 
 1. Clone the repository:
@@ -21,32 +30,40 @@ cd lavalink-stats
 
 2. Install dependencies:
 ```bash
-npm install
+yarn install
 ```
 
+3. Build the application:
+
+```bash
+yarn build
+```
+
+4. Start the application:
+
+```bash
+yarn start
+```
+
+
 ## Configuration
+Edit the `.env` file to configure your Lavalink hosts:
 
-Edit the `config.js` file to configure your Lavalink hosts:
+```
+# host:port:password[:name];host:port:password[:name]
+LL_HOSTS=10.0.0.201:2333:youshallnotpass:KOR 1;10.0.0.202:2333:youshallnotpass:KOR 2;
 
-```javascript
-module.exports = {
-  // Lavalink hosts configuration: [host:port, password, name]
-  hosts: [
-    ["10.0.0.201:2333", "youshallnotpass", "My awesome Lavalink server"],
-    // Add more hosts as needed
-  ],
-  
-  // Database configuration
-  database: {
-    path: "./lavalink_stats.db"
-  },
-  
-  // Collection interval in milliseconds (1 minute = 60000ms)
-  collectionInterval: 60000,
-  
-  // Request timeout in milliseconds
-  requestTimeout: 10000
-};
+# Collection interval
+COLLECTION_INTERVAL_MS=60000
+
+# Request timeout
+REQUEST_TIMEOUT_MS=10000
+
+# Database path
+DB_PATH=/app/data/lavalink_stats.db
+
+# Dashboard port
+PORT=3000
 ```
 
 ## Usage
@@ -56,7 +73,3 @@ Start the application:
 ```bash
 yarn build && yarn start
 ```
-
-## License
-
-WTFPL
