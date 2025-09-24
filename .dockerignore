@@ -4,8 +4,6 @@ Dockerfile*
 docker-compose*.yml
 .git
 .gitignore
-.pnp.cjs
-.pnp.loader.mjs
 .env
 .cache
 coverage
