@@ -6,8 +6,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # 예: "10.0.0.201:2333:youshallnotpass;10.0.0.202:2333:youshallnotpass"
-      - LL_HOSTS=
+      # host:port:password[:name];host:port:password[:name]
+      - LL_HOSTS=10.0.0.201:2333:youshallnotpass:KOR 1;10.0.0.202:2333:youshallnotpass:KOR 2;10.0.0.203:2333:youshallnotpass:KOR 3;10.0.0.204:2333:youshallnotpass:KOR 4;10.0.0.205:2333:youshallnotpass:KOR 5;10.0.0.206:2333:youshallnotpass:KOR 6;10.0.0.207:2333:youshallnotpass:KOR 7;10.0.0.208:2333:youshallnotpass:KOR 8
       - COLLECTION_INTERVAL_MS=60000
       - REQUEST_TIMEOUT_MS=10000
       - DB_PATH=/app/data/lavalink_stats.db
