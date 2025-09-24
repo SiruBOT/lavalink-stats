@@ -9,7 +9,7 @@ class LavalinkDashboard {
         this.remainingSeconds = Math.floor(this.refreshPeriodMs / 1000);
         this.TIMEZONE = 'Asia/Seoul';
         this.KST_OFFSET_MS = 9 * 60 * 60 * 1000; // UTC+9
-        
+
         this.init();
     }
 
@@ -429,9 +429,10 @@ class LavalinkDashboard {
         
         data.forEach(item => {
             // 시간을 분 단위로 반올림
-            const time = new Date(item.timestamp + this.KST_OFFSET_MS);
+            const time = new Date(item.timestamp);
             time.setSeconds(0, 0);
-            const timeKey = time.toISOString();
+            const kst = new Date(time.getTime() + this.KST_OFFSET_MS);
+            const timeKey = kst.toISOString();
             
             if (!grouped[timeKey]) {
                 grouped[timeKey] = [];
