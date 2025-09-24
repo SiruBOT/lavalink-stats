@@ -191,11 +191,14 @@ class LavalinkDashboard {
         };
 
         const resizeAll = () => {
+            const canvasWrap = document.getElementsByClassName('chart-canvas');
             if (this.charts.players && typeof this.charts.players.resize === 'function') {
-                this.charts.players.resize();
+                this.charts.players.resize(0,0);
+                this.charts.players.resize(canvasWrap[0].clientWidth, canvasWrap[0].clientHeight);
             }
             if (this.charts.cpu && typeof this.charts.cpu.resize === 'function') {
-                this.charts.cpu.resize();
+                this.charts.cpu.resize(0,0);
+                this.charts.cpu.resize(canvasWrap[1].clientWidth, canvasWrap[1].clientHeight);
             }
         };
 
@@ -299,6 +302,18 @@ class LavalinkDashboard {
         const serversGrid = document.getElementById('serversGrid');
         serversGrid.innerHTML = '';
 
+        if (data.length === 0) {
+            serversGrid.style.display = 'flex';
+            serversGrid.style.justifyContent = 'center';
+            serversGrid.style.alignItems = 'center';
+            serversGrid.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 20px;">서버가 없습니다</div>';
+            return;
+        } else {
+            serversGrid.style.display = 'grid';
+            serversGrid.style.justifyContent = '';
+            serversGrid.style.alignItems = '';
+        }
+
         data.forEach(server => {
             const serverCard = this.createServerCard(server);
             serversGrid.appendChild(serverCard);
@@ -312,7 +327,6 @@ class LavalinkDashboard {
             : 0;
         
         const cpuSystemPercent = (server.cpu_system_load || 0) * 100;
-        const cpuLavalinkPercent = (server.cpu_lavalink_load || 0) * 100;
 
         const card = document.createElement('div');
         card.className = `server-card ${isOnline ? 'online' : 'offline'}`;
