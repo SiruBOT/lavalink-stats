@@ -7,8 +7,6 @@ class LavalinkDashboard {
         this.currentTimeRange = 24;
         this.refreshPeriodMs = 30000;
         this.remainingSeconds = Math.floor(this.refreshPeriodMs / 1000);
-        this.TIMEZONE = 'Asia/Seoul';
-        this.KST_OFFSET_MS = 9 * 60 * 60 * 1000; // UTC+9
         
         this.init();
     }
@@ -428,12 +426,10 @@ class LavalinkDashboard {
         const grouped = {};
         
         data.forEach(item => {
-            // KST(UTC+9) 기준으로 분 단위 반올림
-            const utc = new Date(item.timestamp);
-            const kst = new Date(utc.getTime() + this.KST_OFFSET_MS);
-            // 저장은 ISO(UTC)로 하되, KST 기준 시각을 UTC로 환산한 값이 되도록 9시간을 다시 빼서 정규화
-            const normalizedUtc = new Date(kst.getTime() - this.KST_OFFSET_MS);
-            const timeKey = normalizedUtc.toISOString();
+            // 시간을 분 단위로 반올림
+            const time = new Date(item.timestamp);
+            time.setSeconds(0, 0);
+            const timeKey = time.toISOString();
             
             if (!grouped[timeKey]) {
                 grouped[timeKey] = [];
@@ -447,17 +443,15 @@ class LavalinkDashboard {
     formatChartTime(timeString) {
         const date = new Date(timeString);
         if (this.currentTimeRange <= 24) {
-            return date.toLocaleTimeString('ko-KR', {
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: this.TIMEZONE
+            return date.toLocaleTimeString('ko-KR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
             });
         } else {
-            return date.toLocaleString('ko-KR', {
-                month: 'short',
+            return date.toLocaleDateString('ko-KR', { 
+                month: 'short', 
                 day: 'numeric',
-                hour: '2-digit',
-                timeZone: this.TIMEZONE
+                hour: '2-digit'
             });
         }
     }
@@ -485,7 +479,7 @@ class LavalinkDashboard {
 
     updateLastUpdatedTime() {
         const now = new Date();
-        document.getElementById('lastUpdated').textContent = now.toLocaleString('ko-KR', { timeZone: this.TIMEZONE });
+        document.getElementById('lastUpdated').textContent = now.toLocaleString('ko-KR');
     }
 
     startCountdown() {
