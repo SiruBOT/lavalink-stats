@@ -12,6 +12,7 @@ services:
       - REQUEST_TIMEOUT_MS=10000
       - DB_PATH=/app/data/lavalink_stats.db
       - PORT=3000
+      - API_PASSWORD=youshallnotpass
     volumes:
       - ./data:/app/data
     restart: unless-stopped

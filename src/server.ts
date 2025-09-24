@@ -4,6 +4,7 @@ import fastifyCors from '@fastify/cors';
 import fastifyStatic from '@fastify/static';
 import Database from './database';
 import getLogger from './logger';
+import { config } from './config';
 
 // Disable Fastify internal logger; we'll log via tslog
 const fastify = Fastify({ logger: false });
@@ -71,6 +72,21 @@ export async function start() {
 
     fastify.get('/', async (_request, reply) => {
       return reply.sendFile('index.html');
+    });
+
+    fastify.get('/api/errors', async (_request, reply) => {
+      const errors = await database.getErrors();
+      return { success: true, data: errors };
+    });
+
+    fastify.post('/api/errors', async (request, reply) => {
+      if (request.headers.authorization !== config.apiPassword) {
+        return { success: false, error: 'Unauthorized' };
+      }
+
+      const { host, name, error } = request.body as { host: string; name: string; error: string };
+      await database.insertError(host, name, error);
+      return { success: true, data: { host, name, error } };
     });
 
     const port = Number(process.env.PORT ?? 3000);

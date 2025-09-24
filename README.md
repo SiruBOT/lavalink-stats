@@ -64,6 +64,9 @@ DB_PATH=/app/data/lavalink_stats.db
 
 # Dashboard port
 PORT=3000
+
+# API password
+API_PASSWORD=youshallnotpass
 ```
 
 ## Usage

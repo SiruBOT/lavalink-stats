@@ -25,6 +25,7 @@ export const config = {
   },
   collectionInterval: Number(process.env.COLLECTION_INTERVAL_MS ?? 60000),
   requestTimeout: Number(process.env.REQUEST_TIMEOUT_MS ?? 10000),
+  apiPassword: process.env.API_PASSWORD ?? 'youshallnotpass',
 };
 
 export type AppConfig = typeof config;

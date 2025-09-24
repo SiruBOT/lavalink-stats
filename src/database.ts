@@ -42,7 +42,15 @@ export class Database {
           cpu_cores INTEGER,
           cpu_system_load REAL,
           cpu_lavalink_load REAL
-        )
+        );
+
+        CREATE TABLE IF NOT EXISTS lavalink_errors (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          host TEXT NOT NULL,
+          name TEXT,
+          timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+          error TEXT
+        );
       `;
 
       this.db!.run(createTableSQL, (err: Error | null) => {
@@ -74,6 +82,36 @@ export class Database {
           if (alterErr) return reject(alterErr);
           resolve();
         });
+      });
+    });
+  }
+
+  async insertError(host: string, name: string, error: string): Promise<number> {
+    if (!this.db) throw new Error('Database not initialized');
+    const insertSQL = `
+      INSERT INTO lavalink_errors (host, name, error) VALUES (?, ?, ?)
+    `;
+    const values = [host, name, error];
+    return await new Promise<number>((resolve, reject) => {
+      this.db!.run(insertSQL, values, function (this: sqlite3pkg.RunResult, err: Error | null) {
+        if (err) {
+          getLogger().error(`Error inserting error: ${(err as any).message}`);
+          reject(err);
+        } else {
+          getLogger().info(`Error inserted for ${host} with ID: ${this.lastID}`);
+          resolve(this.lastID);
+        }
+      });
+    });
+  }
+
+  async getErrors(): Promise<any[]> {
+    if (!this.db) throw new Error('Database not initialized');
+    const sql = 'SELECT * FROM lavalink_errors ORDER BY timestamp DESC';
+    return await new Promise<any[]>((resolve, reject) => {
+      this.db!.all(sql, (err: Error | null, rows: any[]) => {
+        if (err) reject(err);
+        else resolve(rows);
       });
     });
   }
