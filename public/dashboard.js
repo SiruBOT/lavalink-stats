@@ -415,14 +415,14 @@ class LavalinkDashboard {
         this.charts.players.data.labels = labels.map(time => this.formatChartTime(time));
         this.charts.players.data.datasets[0].data = playersData;
         this.charts.players.data.datasets[1].data = playingPlayersData;
-        this.charts.players.options.scales.y.max = Math.max(...playersData, ...playingPlayersData);
+        this.charts.players.options.scales.y.max = Math.ceil(Math.max(...playersData, ...playingPlayersData));
         this.charts.players.update('none');
 
         // CPU 차트 업데이트
         this.charts.cpu.data.labels = labels.map(time => this.formatChartTime(time));
         this.charts.cpu.data.datasets[0].data = systemCpuData;
         this.charts.cpu.data.datasets[1].data = lavalinkCpuData;
-        this.charts.cpu.options.scales.y.max = Math.max(...systemCpuData, ...lavalinkCpuData);
+        this.charts.cpu.options.scales.y.max = Math.ceil(Math.max(...systemCpuData, ...lavalinkCpuData));
         this.charts.cpu.update('none');
     }
 
